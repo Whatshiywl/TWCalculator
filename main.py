@@ -8,8 +8,8 @@ def gen_queue(village_cls):
     initial = []
     queue = []
     for i in range(len(village.get_buildings())):
-        queue = village.get_buildings()[i]
-        n = queue.get_max_level() - queue.get_level()
+        q = village.get_buildings()[i]
+        n = q.get_max_level() - q.get_level()
         queue += [i] * n
     r = initial + random.sample(queue, len(queue))
     # print pr(r)
@@ -25,7 +25,7 @@ def mutate(ind, d):
         while dj == 0:
             dj = random.randint(-d, d) 
         j = i + dj
-        j = j%l
+        j = j % l
         temp = ind[i] 
         ind[i] = ind[j] 
         ind[j] = temp
@@ -97,14 +97,14 @@ def init_toolbox():
 
 
 POP = 100
-NGEN = 10000
-PRINT = 100
+N_GEN = 10000
+PRINT = NGEN / 100
 CXPB = 0.0
 MUTPB = 0.8
 
-TOPPOP = 0.1
-MUTPOP = 0.9
-RNDPOP = 0.0
+TOP_POP = 0.1
+MUT_POP = 0.9
+RND_POP = 0.0
 
 POOLS = 4
 
@@ -121,11 +121,11 @@ def evolve():
     print "start"
     g = 0
     n = 0
-    while g < NGEN:
+    while g < N_GEN:
         n += 1
         # t = time() 
         # Select the next generation individuals
-        offspring = tools.selTournament(pop, int(len(pop) * TOPPOP), int(len(pop) / 10))
+        offspring = tools.selTournament(pop, int(len(pop) * TOP_POP), int(len(pop) / 10))
         # times[0] += time()-t 
         
         # t = time() 
@@ -145,7 +145,7 @@ def evolve():
         # t = time() 
         # Apply mutation on the offspring
         # for mutant in offspring:
-        for i in range(int(POP * MUTPOP)):
+        for i in range(int(POP * MUT_POP)):
             ind = random.sample(offspring, 1)[0]
             mutant = toolbox.clone(ind)
             while random.random() < MUTPB:
@@ -157,7 +157,7 @@ def evolve():
         # times[3] += time()-t 
         
         # t = time() 
-        for i in range(int(POP * RNDPOP)):
+        for i in range(int(POP * RND_POP)):
             offspring += [toolbox.individual()] 
         # times[4] += time()-t
     
@@ -189,7 +189,7 @@ def evolve():
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # times[8] += time()-t
-        if g % (NGEN / PRINT) == 0 or g == NGEN - 1:
+        if g % (N_GEN / PRINT) == 0 or g == N_GEN - 1:
             best = tools.selBest(pop, 1)[0]
             fit = best.fitness.values[:]
             if math.isinf(fit[0]):
