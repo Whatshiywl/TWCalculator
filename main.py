@@ -98,7 +98,7 @@ def init_toolbox():
 
 POP = 100
 N_GEN = 10000
-PRINT = NGEN / 100
+PRINT = N_GEN / 100
 CXPB = 0.0
 MUTPB = 0.8
 
