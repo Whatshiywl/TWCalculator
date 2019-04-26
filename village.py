@@ -6,13 +6,14 @@ productionFactor = 1.16312
 populationFactor = 1.1721
 capacityFactor = 1.2295
 
+
 class Village:
 
     def __init__(self):
         self.hq = Building({
             'level': 1,
             'name': 'hq',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [90, 80, 70, 5],
             'costFactor': [1.26, 1.275, 1.26, 1.17],
             'buildTime': 7*60+30,
@@ -24,7 +25,7 @@ class Village:
         self.woodMine = Building({
             'level': 1,
             'name': 'wm',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [50, 60, 40, 5],
             'costFactor': [1.25, 1.275, 1.245, 1.155],
             'buildTime': 7*60+30,
@@ -38,7 +39,7 @@ class Village:
         self.clayMine = Building({
             'level': 1,
             'name': 'cm',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [65, 50, 40, 10],
             'costFactor': [1.27, 1.265, 1.24, 1.14],
             'buildTime': 7*60+30,
@@ -52,7 +53,7 @@ class Village:
         self.ironMine = Building({
             'level': 1,
             'name': 'im',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [75, 65, 70, 10],
             'costFactor': [1.252, 1.275, 1.24, 1.17],
             'buildTime': 9*60,
@@ -66,7 +67,7 @@ class Village:
         self.farm = Building({
             'level': 1,
             'name': 'fm',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [45, 40, 30, 0],
             'costFactor': [1.3, 1.32, 1.29, 1],
             'buildTime': 10*60,
@@ -80,7 +81,7 @@ class Village:
         self.warehouse = Building({
             'level': 1,
             'name': 'wh',
-            'maxLevel': 30,#30,
+            'maxLevel': 30,  # 30,
             'cost': [60, 50, 40, 0],
             'costFactor': [1.265, 1.27, 1.245, 1.15],
             'buildTime': 8*60+30,
@@ -94,7 +95,7 @@ class Village:
         self.barracks = Building({
             'level': 0,
             'name': 'br',
-            'maxLevel': 25,#25,
+            'maxLevel': 25,  # 25,
             'cost': [200, 170, 90, 7],
             'costFactor': [1.26, 1.28, 1.26, 1.17],
             'buildTime': 15*60,
@@ -106,7 +107,7 @@ class Village:
         self.stable = Building({
             'level': 0,
             'name': 'sb',
-            'maxLevel': 20,#20,
+            'maxLevel': 20,  # 20,
             'cost': [270, 240, 260, 8],
             'costFactor': [1.26, 1.28, 1.26, 1.17],
             'buildTime': 50*60,
@@ -229,31 +230,31 @@ class Village:
         self.buildings += [self.hide]
         self.buildings += [self.wall]
 
-    def getBuildings(self):
+    def get_buildings(self):
         return self.buildings
 
-    def getWoodYield(self):
-        return self.woodMine.getProduction()
+    def get_wood_yield(self):
+        return self.woodMine.get_production()
 
-    def getClayYield(self):
-        return self.clayMine.getProduction()
+    def get_clay_yield(self):
+        return self.clayMine.get_production()
 
-    def getIronYield(self):
-        return self.ironMine.getProduction()
+    def get_iron_yield(self):
+        return self.ironMine.get_production()
 
-    def getYield(self, i):
+    def get_yield(self, i):
         if i == 0:
-            return self.getWoodYield() 
+            return self.get_wood_yield()
         elif i == 1:
-            return self.getClayYield() 
+            return self.get_clay_yield()
         elif i == 2:
-            return self.getIronYield()
+            return self.get_iron_yield()
 
-    def getPopulation(self):
-        return sum(map(lambda b: b.getPopulation(), self.buildings))
+    def get_population(self):
+        return sum(map(lambda b: b.get_population(), self.buildings))
 
-    def getPopLimit(self):
-        return self.farm.getPopulation()
+    def get_pop_limit(self):
+        return self.farm.get_population()
 
-    def getCapacity(self):
-        return self.warehouse.getCapacity()
+    def get_capacity(self):
+        return self.warehouse.get_capacity()

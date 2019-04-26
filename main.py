@@ -2,20 +2,22 @@ from sim import Simulation
 from village import Village
 import random
 
-def genQueue(villageCls):
-    village = villageCls()
+
+def gen_queue(village_cls):
+    village = village_cls()
     initial = []
-    base = []
-    for i in range(len(village.getBuildings())):
-        b = village.getBuildings()[i]
-        n = b.getMaxLevel()-b.getLevel()
-        base += [i]*n
-    r = initial + random.sample(base, len(base))
+    queue = []
+    for i in range(len(village.get_buildings())):
+        queue = village.get_buildings()[i]
+        n = queue.get_max_level() - queue.get_level()
+        queue += [i] * n
+    r = initial + random.sample(queue, len(queue))
     # print pr(r)
-    return r 
+    return r
+
     
 def mutate(ind, d):
-    l = len(ind) 
+    l = len(ind)
     i = random.randint(0, l - 1)
     m = random.randint(0, 2)
     if m == 0:
@@ -35,6 +37,7 @@ def mutate(ind, d):
         ind = ind[:i] + ind[j:]
     return ind
 
+
 def mutate2(ind):
     i, j = random.sample(range(len(ind)), 2)
     temp = ind[i] 
@@ -49,8 +52,10 @@ def crossover(ch1, ch2):
     ch1[:i] = ch2[:i] 
     ch2[:i] = temp
 
+
 def simulate(ind):
     return Simulation().simulate(ind)
+
 
 def pr(ind):
     s = '|'
@@ -69,62 +74,58 @@ def pr(ind):
             n += 1
     return s
 
+
 def pr2(ind):
     village = Village()
     s = '|'
     for b in ind:
-        building = village.getBuildings()[b]
-        building.levelUp()
-        s += building.getName() + ('%02d' % building.getLevel()) + "|"
+        building = village.get_buildings()[b]
+        building.level_up()
+        s += building.get_name() + ('%02d' % building.get_level()) + "|"
     return s
 
-def initToolbox():
-    creator.create("FitnessMax", base.Fitness, weights=(-1.0, -1E-10))
+
+def init_toolbox():
+    creator.create("FitnessMax", base.Fitness, weights=(1.0, 1E-10))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
     toolbox = base.Toolbox()
-    toolbox.register("genQueue", genQueue, Village)
+    toolbox.register("genQueue", gen_queue, Village)
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.genQueue)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     return toolbox
 
-def toTime(seconds):
-    s = seconds%60
-    m = (seconds%3600)/60
-    h = (seconds%(24*3600))/3600
-    d = seconds/(24*3600)
-    return '%02dd%02d:%02d:%02d' % (d, h, m, s)
+
+POP = 100
+NGEN = 10000
+PRINT = 100
+CXPB = 0.0
+MUTPB = 0.8
+
+TOPPOP = 0.1
+MUTPOP = 0.9
+RNDPOP = 0.0
+
+POOLS = 4
+
 
 def evolve():
     print "setup"
 
-    toolbox = initToolbox()
+    toolbox = init_toolbox()
 
-    times = [0]*9
+    # times = [0] * 9
     
-    POP = 100
-    NGEN = 10000
-    PRINT = 100
-    CXPB = 0.0
-    MUTPB = 0.8
-    
-    TOPPOP = 0.1
-    MUTPOP = 0.9
-    RNDPOP = 0.0
-    
-    pop = toolbox.population(POP) 
-
-    POOLS = 0
+    pop = toolbox.population(POP)
     pool = Pool(POOLS) if POOLS else 0
-    
-    print "start" 
+    print "start"
     g = 0
     n = 0
     while g < NGEN:
         n += 1
         # t = time() 
         # Select the next generation individuals
-        offspring = tools.selTournament(pop, int(len(pop)*TOPPOP), int(len(pop)/10)) 
+        offspring = tools.selTournament(pop, int(len(pop) * TOPPOP), int(len(pop) / 10))
         # times[0] += time()-t 
         
         # t = time() 
@@ -143,20 +144,20 @@ def evolve():
     
         # t = time() 
         # Apply mutation on the offspring
-        #for mutant in offspring:
-        for i in range(int(POP*MUTPOP)):
+        # for mutant in offspring:
+        for i in range(int(POP * MUTPOP)):
             ind = random.sample(offspring, 1)[0]
             mutant = toolbox.clone(ind)
             while random.random() < MUTPB:
             # if random.random() < MUTPB:
-                mutate(mutant, len(mutant)/2)
+                mutate(mutant, len(mutant) / 2)
                 # mutate2(mutant)
             del mutant.fitness.values
             offspring += [mutant] 
         # times[3] += time()-t 
         
         # t = time() 
-        for i in range(int(POP*RNDPOP)):
+        for i in range(int(POP * RNDPOP)):
             offspring += [toolbox.individual()] 
         # times[4] += time()-t
     
@@ -179,7 +180,7 @@ def evolve():
         best = tools.selBest(offspring, 1)[0]
         fit = best.fitness.values
         if math.isinf(fit[0]):
-            if n%1 == 0:
+            if n % 1 == 0:
                 print 'try again', n
             pop = toolbox.population(POP)
             continue
@@ -188,22 +189,22 @@ def evolve():
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # times[8] += time()-t
-        if g%(NGEN/PRINT) == 0 or g == NGEN-1:
+        if g % (NGEN / PRINT) == 0 or g == NGEN - 1:
             best = tools.selBest(pop, 1)[0]
             fit = best.fitness.values[:]
             if math.isinf(fit[0]):
                 fit = (-1, -1)
             else:
-                fit = (toTime(fit[0]), int(fit[1]))
-            print g, fit[0], fit[1]
-            print pr2(best)
-            #print times
+                fit = (int(-fit[0]), int(fit[1]))
+            print g, len(offspring), fit, pr2(best)
+            # print times
             # times = [0]*9
         g += 1        
     print "done" 
 
+
 if __name__ == '__main__':
-    from time import time
+    # from time import time
     from deap import base, creator, tools
     import math
     from multiprocessing import Pool

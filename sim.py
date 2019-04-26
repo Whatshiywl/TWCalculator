@@ -1,5 +1,6 @@
 from village import Village
 
+
 class Simulation:
     time = 0
     wait = 0
@@ -11,66 +12,64 @@ class Simulation:
     def __init__(self):
         self.village = Village()
 
-    def setPop(self, p):
-        self.pop = p
-
-    def consumeResources(self, cost):
+    def consume_resources(self, cost):
         for i in range(len(self.res)):
             self.res[i] -= cost[i]
 
-    def calcTime(self, dt, w=False):
+    def calc_time(self, dt, w=False):
         self.time += dt
         if w:
             self.wait += dt
-        capacity = self.village.getCapacity()
+        capacity = self.village.get_capacity()
         for i in range(len(self.res)):
-            self.res[i] = min([capacity, self.res[i] + self.village.getYield(i)*dt])
+            self.res[i] = min([capacity, self.res[i] + self.village.get_yield(i) * dt])
         
-    def getTime(self):
-        return self.time
+    def get_time(self):
+        return self.time / 3600.0 / 24.0
         
-    def getWait(self):
+    def get_wait(self):
         return self.wait
 
-    def hasResources(self, target):
+    def has_resources(self, target):
         return self.res[0] >= target[0] and self.res[1] >= target[0] and self.res[2] >= target[2]
 
-    def hasPopulation(self, target):
-        return self.village.getPopulation() <= self.village.getPopLimit()
+    def has_population(self, target):
+        return self.village.get_population() <= self.village.get_pop_limit()
 
     def build(self, item):
-        nextFromQueue = self.village.getBuildings()[item]
-        if(nextFromQueue.getLevel() >= nextFromQueue.getMaxLevel()):
-            print "tried raise " + str(item) + " to level " + str(nextFromQueue.getLevel())
+        next_from_queue = self.village.get_buildings()[item]
+        if next_from_queue.get_level() >= next_from_queue.get_max_level():
+            print "tried raise " + str(item) + " to level " + str(next_from_queue.get_level())
             return False
-        nextCost = nextFromQueue.getCost()
-        if max(nextCost) > self.village.getCapacity():
-            # print "res fail", nextCost, self.village.getCapacity()
+        next_cost = next_from_queue.get_cost()
+        if max(next_cost) > self.village.get_capacity():
+            # print "res fail", next_cost, self.village.getCapacity()
             return False
-        if not self.hasResources(nextCost):
-            maxTime = 0
+        if not self.has_resources(next_cost):
+            max_time = 0
             for i in range(len(self.res)):
-                diff = nextCost[i] - self.res[i] 
-                prod = self.village.getYield(i)
-                t = diff/prod
-                if t > maxTime:
-                    maxTime = t
-            self.calcTime(maxTime, True)
-        self.consumeResources(nextCost)
-        baseTime = nextFromQueue.getBuildTime()
-        dt = baseTime*1.05**(-self.village.hq.getLevel())
-        self.calcTime(dt) 
-        nextFromQueue.levelUp()
-        if not self.hasPopulation(nextCost):
-            # print "pop fail", self.village.getPopulation(), self.village.getPopLimit(), nextFromQueue().getLevel()
+                diff = next_cost[i] - self.res[i]
+                prod = self.village.get_yield(i)
+                t = diff / prod
+                if t > max_time:
+                    max_time = t
+            self.calc_time(max_time, True)
+        self.consume_resources(next_cost)
+        base_time = next_from_queue.get_build_time()
+        dt = base_time * 1.05 ** (-self.village.hq.get_level())
+        self.calc_time(dt)
+        next_from_queue.level_up()
+        if not self.has_population(next_cost):
+            # print "pop fail", self.village.getPopulation(), self.village.getPopLimit(), next_from_queue().getLevel()
             return False
-        self.points = sum(map(lambda b: b.getPoints(), self.village.getBuildings()))
+        self.points = sum(map(lambda b: b.get_points(), self.village.get_buildings()))
         return True
     
     def simulate(self, q):
         for item in q:
             if not self.build(item):
-                self.calcTime(float('inf'), True)
-                # self.calcTime(365*24*60*60, True)
+                self.calc_time(float('inf'), True)
+                # self.calcTime(365 * 24 * 60 * 60, True)
                 break
-        return self.getTime(), self.getWait()
+        return -self.get_time(), self.points  # , -self.getWait()
+
