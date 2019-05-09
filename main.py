@@ -1,7 +1,7 @@
 from sim import Simulation
 from village import Village
 import random
-
+from numba import cuda, jit
 
 def gen_queue(village_cls):
     village = village_cls()
@@ -23,18 +23,18 @@ def mutate(ind, d):
     if m == 0:
         dj = 0
         while dj == 0:
-            dj = random.randint(-d, d) 
+            dj = random.randint(int(-d), int(d)) 
         j = i + dj
         j = j % l
         temp = ind[i] 
         ind[i] = ind[j] 
         ind[j] = temp
     elif m == 1:
-        b = random.sample(range(max(ind)*d), random.randint(1, d))
+        b = random.sample(range(max(ind)*int(d)), random.randint(1, int(d)))
         ind = ind[:i] + b + ind[i:]
     elif m == 2:
         j = max(i+d, len(ind)-1)
-        ind = ind[:i] + ind[j:]
+        ind = ind[:int(i)] + ind[int(j):]
     return ind
 
 
@@ -53,6 +53,7 @@ def crossover(ch1, ch2):
     ch2[:i] = temp
 
 
+# @cuda.jit
 def simulate(ind):
     return Simulation().simulate(ind)
 
@@ -106,11 +107,11 @@ TOP_POP = 0.1
 MUT_POP = 0.9
 RND_POP = 0.0
 
-POOLS = 4
+POOLS = 8
 
 
 def evolve():
-    print "setup"
+    print ("setup")
 
     toolbox = init_toolbox()
 
@@ -118,7 +119,7 @@ def evolve():
     
     pop = toolbox.population(POP)
     pool = Pool(POOLS) if POOLS else 0
-    print "start"
+    print ("start")
     g = 0
     n = 0
     while g < N_GEN:
@@ -130,7 +131,7 @@ def evolve():
         
         # t = time() 
         # Clone the selected individuals
-        offspring = map(toolbox.clone, offspring)
+        offspring = list(map(toolbox.clone, offspring))
         # times[1] += time()-t
     
         # t = time() 
@@ -169,7 +170,7 @@ def evolve():
         
         # t = time() 
         mp = map if not pool else pool.map
-        fitnesses = mp(simulate, queues)
+        fitnesses = list(mp(simulate, queues))
         # times[6] += time()-t
         
         # t = time() 
@@ -181,7 +182,7 @@ def evolve():
         fit = best.fitness.values
         if math.isinf(fit[0]):
             if n % 1 == 0:
-                print 'try again', n
+                print ('try again', n)
             pop = toolbox.population(POP)
             continue
 
@@ -196,11 +197,11 @@ def evolve():
                 fit = (-1, -1)
             else:
                 fit = (int(-fit[0]), int(fit[1]))
-            print g, len(offspring), fit, pr2(best)
-            # print times
+            print (g, len(offspring), fit, pr2(best))
+            # print (times)
             # times = [0]*9
         g += 1        
-    print "done" 
+    print ("done") 
 
 
 if __name__ == '__main__':

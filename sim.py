@@ -39,7 +39,7 @@ class Simulation:
     def build(self, item):
         next_from_queue = self.village.get_buildings()[item]
         if next_from_queue.get_level() >= next_from_queue.get_max_level():
-            print "tried raise " + str(item) + " to level " + str(next_from_queue.get_level())
+            print ("tried raise " + str(item) + " to level " + str(next_from_queue.get_level()))
             return False
         next_cost = next_from_queue.get_cost()
         if max(next_cost) > self.village.get_capacity():
